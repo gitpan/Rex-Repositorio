@@ -10,7 +10,6 @@ use Moose;
 use Try::Tiny;
 use File::Basename qw'basename';
 use Data::Dumper;
-use Digest::SHA;
 use Carp;
 use Params::Validate qw(:all);
 use File::Spec;
@@ -26,8 +25,8 @@ sub mirror {
   my $name = $self->repo->{name};
 
   my $repomd_ref =
-    $self->app->decode_xml(
-    $self->app->download( $self->repo->{url} . "/repodata/repomd.xml" ) );
+    $self->decode_xml(
+    $self->download( $self->repo->{url} . "/repodata/repomd.xml" ) );
 
   my ($primary_file) =
     grep { $_->{type} eq "primary" } @{ $repomd_ref->{data} };
@@ -35,7 +34,7 @@ sub mirror {
 
   my $url = $self->repo->{url} . "/" . $primary_file;
   $self->app->logger->debug("Downloading $url.");
-  my $xml = $self->app->get_xml( $self->app->download_gzip($url) );
+  my $xml = $self->get_xml( $self->download_gzip($url) );
 
   my @packages;
   my @xml_packages = $xml->getElementsByTagName('package');
@@ -61,7 +60,7 @@ sub mirror {
     my $package_name = $package->{name};
 
     my $local_file = $self->repo->{local} . "/" . $package->{location};
-    $self->app->download_package(
+    $self->download_package(
       url  => $package_url,
       name => $package_name,
       dest => $local_file,
@@ -77,13 +76,13 @@ sub mirror {
   }
 
   try {
-    $self->app->download_metadata(
+    $self->download_metadata(
       url   => $self->repo->{url} . "/repodata/repomd.xml",
       dest  => $self->repo->{local} . "/repodata/repomd.xml",
       force => $option{update_metadata},
     );
 
-    $self->app->download_metadata(
+    $self->download_metadata(
       url   => $self->repo->{url} . "/repodata/repomd.xml.asc",
       dest  => $self->repo->{local} . "/repodata/repomd.xml.asc",
       force => $option{update_metadata},
@@ -98,7 +97,7 @@ sub mirror {
       $self->{repo}->{url} . "/" . $file_data->{location}->[0]->{href};
     my $file = basename $file_data->{location}->[0]->{href};
 
-    $self->app->download_metadata(
+    $self->download_metadata(
       url  => $file_url,
       dest => $self->repo->{local} . "/repodata/$file",
       cb   => sub {
@@ -123,7 +122,7 @@ sub mirror {
     {
       my $file_url   = $self->repo->{url} . "/" . $file;
       my $local_file = $self->repo->{local} . "/" . $file;
-      $self->app->download_package(
+      $self->download_package(
         url  => $file_url,
         name => $file,
         dest => $local_file,
@@ -155,7 +154,7 @@ sub add_file {
   my $dest = $self->app->get_repo_dir( repo => $self->repo->{name} ) . "/"
     . basename( $option{file} );
 
-  $self->app->add_file_to_repo( source => $option{file}, dest => $dest );
+  $self->add_file_to_repo( source => $option{file}, dest => $dest );
 
   $self->_run_createrepo();
 }
@@ -175,7 +174,7 @@ sub remove_file {
   my $file = $self->app->get_repo_dir( repo => $self->repo->{name} ) . "/"
     . basename( $option{file} );
 
-  $self->app->remove_file_from_repo( file => $file );
+  $self->remove_file_from_repo( file => $file );
 
   $self->_run_createrepo();
 }
@@ -185,27 +184,6 @@ sub _run_createrepo {
 
   my $repo_dir = $self->app->get_repo_dir( repo => $self->repo->{name} );
   system "cd $repo_dir ; createrepo .";
-}
-
-sub _checksum {
-  my ( $self, $file, $type, $wanted_checksum ) = @_;
-
-  my $c_type = 1;
-  if ( $type eq "sha256" ) {
-    $c_type = "256";
-  }
-
-  my $sha = Digest::SHA->new($c_type);
-  $sha->addfile($file);
-  my $file_checksum = $sha->hexdigest;
-
-  $self->app->logger->debug(
-    "wanted_checksum: $wanted_checksum == $file_checksum");
-
-  if ( $wanted_checksum ne $file_checksum ) {
-    $self->app->logger->error("Checksum for $file wrong.");
-    confess "Checksum of $file wrong.";
-  }
 }
 
 1;
