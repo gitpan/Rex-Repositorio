@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142060",
    "license" : [
       "unknown"
    ],
@@ -54,5 +54,5 @@
          "url" : "https://github.com/krimdomu/repositorio"
       }
    },
-   "version" : "v0.1.0"
+   "version" : "v0.1.1"
 }
