@@ -116,17 +116,24 @@ sub mirror {
       (
         "images/boot.iso",           "images/efiboot.img",
         "images/efidisk.img",        "images/install.img",
-        "images/pxeboot/initrd.img", "images/pxeboot/vmlinuz"
+        "images/pxeboot/initrd.img", "images/pxeboot/vmlinuz",
+        "images/upgrade.img",
       )
       )
     {
       my $file_url   = $self->repo->{url} . "/" . $file;
       my $local_file = $self->repo->{local} . "/" . $file;
-      $self->download_package(
-        url  => $file_url,
-        name => $file,
-        dest => $local_file,
-      );
+      try {
+        $self->download_package(
+          url  => $file_url,
+          name => $file,
+          dest => $local_file,
+        );
+        1;
+      }
+      catch {
+        $self->app->logger->error("Error downloading $file_url.");
+      };
     }
   }
 }
@@ -183,7 +190,43 @@ sub _run_createrepo {
   my $self = shift;
 
   my $repo_dir = $self->app->get_repo_dir( repo => $self->repo->{name} );
+
+  if ( exists $self->repo->{gpg} && $self->repo->{gpg}->{key} ) {
+    unlink "$repo_dir/repodata/repomd.xml.asc";
+  }
+
   system "cd $repo_dir ; createrepo .";
+  if ( $? != 0 ) {
+    confess "Error running createrepo.";
+  }
+
+  if ( exists $self->repo->{gpg} && $self->repo->{gpg}->{key} ) {
+    my $key  = $self->repo->{gpg}->{key};
+    my $pass = $self->repo->{gpg}->{password};
+    if ( !$pass ) {
+      $pass = $self->read_password("GPG key passphrase: ");
+    }
+
+    my $cmd =
+        "cd $repo_dir ; gpg --default-key $key -a --batch --passphrase '"
+      . $pass
+      . "' --detach-sign repodata/repomd.xml";
+    system $cmd;
+
+    if ( $? != 0 ) {
+      $cmd =~ s/\Q$pass\E/\*\*\*\*\*\*\*/;
+      confess "Error running: $cmd";
+    }
+
+    # export pub key as asc file
+    my $pub_file = $self->repo->{name} . ".asc";
+    $cmd = "cd $repo_dir ; gpg -a --output $pub_file --export $key";
+    system $cmd;
+
+    if ( $? != 0 ) {
+      confess "Error running gpg export: $cmd";
+    }
+  }
 }
 
 # test if all necessary parameters are available

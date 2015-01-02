@@ -27,10 +27,11 @@ requires:
   Log::Log4perl: '0'
   Moose: '0'
   Params::Validate: '0'
+  Term::ReadKey: '0'
   Try::Tiny: '0'
   XML::LibXML: '0'
   XML::Simple: '0'
   common::sense: '0'
 resources:
   repository: https://github.com/krimdomu/repositorio
-version: v0.1.1
+version: v0.2.0

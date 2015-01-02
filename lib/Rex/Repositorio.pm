@@ -21,7 +21,7 @@ use File::Spec;
 use File::Copy;
 use Rex::Repositorio::Repository_Factory;
 
-our $VERSION = "0.1.1";
+our $VERSION = "0.2.0";
 
 has config => ( is => 'ro' );
 has logger => ( is => 'ro' );
@@ -320,7 +320,6 @@ sub _help {
 
 1;
 
-
 __END__
 
 =pod
@@ -420,6 +419,35 @@ I</etc/rex/repositorio.conf>.
    component = main
  </Repository>
  
+If you want to sign your custom repositories you have to configure the gpg key to use.
+repositorio automatically exports the public key into the root of the repository, so it can be imported from the clients.
+If you don't specify the gpg password repositorio will ask you for the password.
+
+An example for YUM repositories:
+
+ <Repository centos-6-x86-64-mixed>
+   local = centos-6-x86-64-mixed/mixed/6/x86_64/
+   type  = Yum
+   <gpg>
+     key      = DA95F273
+     password = test
+   </gpg>
+ </Repository>
+
+An example for APT repositories:
+
+ <Repository debian-7-x86-64-mixed>
+   local     = debian-7-x86-64-mixed/debian
+   type      = Apt
+   arch      = amd64
+   dist      = wheezy
+   component = mixed
+   <gpg>
+     key      = DA95F273
+     password = test
+   </gpg>
+ </Repository>
+
 An example log4perl.conf file:
 
  log4perl.rootLogger                    = DEBUG, FileAppndr1
