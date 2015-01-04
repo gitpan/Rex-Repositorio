@@ -11,6 +11,8 @@ use Log::Log4perl;
 use Data::Dumper;
 use Getopt::Long;
 
+use lib '/usr/lib/rex/perl/share/perl5/vendor_perl';
+
 my @config_file_locations = (
   "/etc/rex/repositorio.conf", "/usr/local/etc/rex/repositorio.conf",
   "./repositorio.conf"
@@ -26,7 +28,7 @@ if ( !$config_file ) {
 my $conf_o = Config::General->new($config_file);
 my %conf   = $conf_o->getall;
 
-if(! exists $conf{Log4perl}) {
+if ( !exists $conf{Log4perl} ) {
   print "No configuration for log4perl found. Exiting.\n";
   exit 1;
 }
@@ -43,7 +45,9 @@ my %cli;
 GetOptions(
   \%cli,        "mirror",          "tag=s",        "repo=s",
   "help",       "update-metadata", "update-files", "list",
-  "add-file=s", "remove-file=s",   "init"
+  "add-file=s", "remove-file=s",   "init",         "server",
+  "errata",     "update-errata",   "package=s",    "version=s",
+  "arch=s",
 );
 
 my $app = Rex::Repositorio->new( config => \%conf, logger => $logger );
@@ -70,11 +74,11 @@ create consistant installations of your server.
 
 =item * Web Site: L<http://repositor.io/>
 
-=item * IRC: irc.freenode.net #repositorio
+=item * IRC: irc.freenode.net #rex (RexOps IRC Channel)
 
-=item * Bug Tracker: L<https://github.com/krimdomu/repositorio/issues>
+=item * Bug Tracker: L<https://github.com/RexOps/repositorio/issues>
 
-=item * Twitter: L<http://twitter.com/jfried83>
+=item * Twitter: L<http://twitter.com/RexOps>
 
 =back
 
@@ -99,6 +103,18 @@ create consistant installations of your server.
 =item --remove-file=file  remove a file from a repository (needs --repo)
 
 =item --list              list known repositories
+
+=item --server            start a server for file delivery. (not available for all repository types)
+
+=item --update-errata     updates the errata database for a repo (needs --repo)",
+
+=item --errata            query errata for a package (needs --repo, --package, --version, --arch)",
+
+=item --package=pkg       for which package the errata should be queries",
+
+=item --version=ver       for which version of a package the errata should be queries",
+
+=item --arch=arch         for which architecture of a package the errata should be queries",
 
 =item --help              display this help message
 

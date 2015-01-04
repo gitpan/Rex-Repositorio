@@ -23,6 +23,8 @@ use File::Copy;
 use Digest::SHA;
 use Digest::MD5;
 use Term::ReadKey;
+use JSON::XS;
+use List::MoreUtils 'firstidx';
 
 has app  => ( is => 'ro' );
 has repo => ( is => 'ro' );
@@ -322,6 +324,91 @@ sub read_password {
   ReadMode 0;
   print "\n";
   return $password;
+}
+
+sub get_errata {
+  my $self   = shift;
+  my %option = validate(
+    @_,
+    {
+      package => {
+        type => SCALAR
+      },
+      version => {
+        type => SCALAR
+      },
+      arch => {
+        type => SCALAR
+      },
+    }
+  );
+
+  my $errata_dir =
+    $self->app->get_errata_dir( repo => $self->repo->{name}, tag => "head" );
+
+  my $ref = decode_json(
+    IO::All->new(
+      File::Spec->catfile(
+        $errata_dir, $option{arch},
+        substr( $option{package}, 0, 1 ), $option{package},
+        "errata.json"
+      )
+    )->slurp
+  );
+
+  my $package = $option{package};
+  my $arch    = $option{arch};
+  my $version = $option{version};
+
+  my $pkg      = $ref;
+  my @versions = keys %{$pkg};
+
+  @versions = sort { $a cmp $b } @versions;
+
+  my $idx = firstidx { ( $_ cmp $version ) == 1 } @versions;
+  if ( $idx == -1 ) {
+
+    # no updates found
+    return $self->render( json => {} );
+  }
+
+  $idx = 0 if ( $idx <= 0 );
+
+  my @update_versions = @versions[ $idx .. $#versions ];
+  my $ret;
+  for my $uv (@update_versions) {
+    $ret->{$uv} = $pkg->{$uv};
+  }
+
+  return $ret;
+}
+
+sub update_errata {
+  my $self = shift;
+
+  my $errata_type = $self->repo->{errata};
+  $self->app->logger->debug("Updating errata of type: $errata_type");
+
+  my $data = $self->download("http://errata.repositor.io/$errata_type.tar.gz");
+  open(my $fh, ">", "/tmp/$errata_type.tar.gz") or confess($!);
+  binmode $fh;
+  print $fh $data;
+  close($fh);
+
+  my $errata_dir =
+    $self->app->get_errata_dir( repo => $self->repo->{name}, tag => "head" );
+
+  mkpath $errata_dir;
+
+  system "cd $errata_dir ; tar xzf /tmp/$errata_type.tar.gz";
+
+  if($? != 0) {
+    confess "Error extracting errata database.";
+  }
+
+  unlink "/tmp/$errata_type.tar.gz";
+
+  $self->app->logger->debug("Updating errata of type: $errata_type (done)");
 }
 
 1;
