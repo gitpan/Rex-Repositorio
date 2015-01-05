@@ -36,4 +36,4 @@ requires:
   common::sense: '0'
 resources:
   repository: https://github.com/krimdomu/repositorio
-version: v0.3.1
+version: v0.3.2
