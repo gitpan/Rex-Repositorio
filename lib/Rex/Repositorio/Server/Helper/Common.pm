@@ -1,13 +1,15 @@
 #
 # (c) Jan Gehring <jan.gehring@gmail.com>
-# 
+#
 # vim: set ts=2 sw=2 tw=0:
 # vim: set expandtab:
-   
+
 package Rex::Repositorio::Server::Helper::Common;
 
 use strict;
 use warnings;
+
+our $VERSION = '0.4.0'; # VERSION
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Params::Validate qw(:all);

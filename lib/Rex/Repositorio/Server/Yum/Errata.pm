@@ -14,6 +14,8 @@ use List::MoreUtils 'firstidx';
 use Data::Dumper;
 require IO::All;
 
+our $VERSION = '0.4.0'; # VERSION
+
 sub query {
   my ($self) = @_;
 

@@ -14,6 +14,8 @@ use File::Basename 'basename';
 require IO::All;
 use JSON::XS;
 
+our $VERSION = '0.4.0'; # VERSION
+
 sub put_image {
   my ($self) = @_;
 
@@ -94,7 +96,8 @@ sub get_image_ancestry {
   while ($parent) {
     my $parent_id = basename $parent;
     push @ids, $parent_id;
-    $parent = readlink File::Spec->catfile( $image_dir, "..", $parent_id, "parent" );
+    $parent =
+      readlink File::Spec->catfile( $image_dir, "..", $parent_id, "parent" );
   }
 
   $self->render( json => \@ids );

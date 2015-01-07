@@ -23,18 +23,24 @@ use Rex::Repositorio::Repository_Factory;
 use JSON::XS;
 use Data::Dumper;
 
-our $VERSION = "0.3.2";
+our $VERSION = '0.4.0'; # VERSION
 
 has config => ( is => 'ro' );
 has logger => ( is => 'ro' );
-has ua     => (
-  is      => 'ro',
-  default => sub {
-    my $ua = LWP::UserAgent->new;
-    $ua->env_proxy;
-    return $ua;
+
+sub ua {
+  my ( $self, %option ) = @_;
+  my $ua = LWP::UserAgent->new;
+  $ua->env_proxy;
+
+  if ( exists $option{ssl_opts} ) {
+    for my $key ( keys %{ $option{ssl_opts} } ) {
+      $ua->ssl_opts( $key, $option{ssl_opts}->{$key} );
+    }
   }
-);
+
+  return $ua;
+}
 
 sub run {
   my ( $self, %option ) = @_;
@@ -121,10 +127,9 @@ sub server {
   require Mojolicious::Commands;
 
   # pass config to mojo app
-  $ENV{'REPO_CONFIG'}           = encode_json( $self->config );
-  $ENV{'REPO_NAME'}             = $option{repo};
-  $ENV{'MOJO_MAX_MESSAGE_SIZE'} = 1024 * 1024 * 1024 * 1024
-    ;    # set max_message_size astronomically high / TODO: make it configurable
+  $ENV{'REPO_CONFIG'} = encode_json( $self->config );
+  $ENV{'REPO_NAME'}   = $option{repo};
+  $ENV{'MOJO_MAX_MESSAGE_SIZE'} = 1024 * 1024 * 1024 * 1024; # set max_message_size astronomically high / TODO: make it configurable
   my $server_type = $self->config->{Repository}->{ $option{repo} }->{type};
   if ( $server_type eq "Apt" ) {
     $server_type = "Yum";
@@ -200,7 +205,7 @@ sub list {
 }
 
 sub update_errata {
-  my $self = shift;
+  my $self   = shift;
   my %option = validate(
     @_,
     {
@@ -208,7 +213,7 @@ sub update_errata {
         type => SCALAR
       },
     }
-  ); 
+  );
 
   my $repo   = $self->config->{Repository}->{ $option{repo} };
   my $type   = $repo->{type};
@@ -471,6 +476,8 @@ sub _help {
 1;
 
 __END__
+
+# ABSTRACT: repositor.io is a tool to create and manage linux repositories.
 
 =pod
 
