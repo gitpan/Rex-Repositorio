@@ -15,7 +15,7 @@ use Rex::Repositorio::Server::Docker::Helper::Auth;
 use JSON::XS;
 use Data::Dumper;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 # TODO: implement authentication and authorization
 #       currently this is just a random string

@@ -11,7 +11,7 @@ use Params::Validate qw(:all);
 use English;
 use Carp;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 sub create {
   my $class  = shift;

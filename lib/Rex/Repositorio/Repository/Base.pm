@@ -26,7 +26,7 @@ use Term::ReadKey;
 use JSON::XS;
 use List::MoreUtils 'firstidx';
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 has app  => ( is => 'ro' );
 has repo => ( is => 'ro' );

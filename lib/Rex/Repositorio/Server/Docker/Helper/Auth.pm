@@ -9,7 +9,7 @@ package Rex::Repositorio::Server::Docker::Helper::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 sub create {
   my ( $class, $type, $config ) = @_;

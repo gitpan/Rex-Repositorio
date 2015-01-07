@@ -17,7 +17,7 @@ use File::Spec;
 use File::Path;
 use IO::All;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 extends "Rex::Repositorio::Repository::Base";
 

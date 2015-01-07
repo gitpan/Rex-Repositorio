@@ -10,7 +10,7 @@ use Mojo::Base 'Mojolicious::Controller';
 use File::Spec;
 use File::Path;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 sub serve {
   my ($self) = @_;

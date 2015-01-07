@@ -14,7 +14,7 @@ use File::Basename 'basename';
 require IO::All;
 use JSON::XS;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 sub put_image {
   my ($self) = @_;

@@ -23,7 +23,7 @@ use Rex::Repositorio::Repository_Factory;
 use JSON::XS;
 use Data::Dumper;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 has config => ( is => 'ro' );
 has logger => ( is => 'ro' );

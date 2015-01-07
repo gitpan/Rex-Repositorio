@@ -14,7 +14,7 @@ use Params::Validate qw(:all);
 use File::Basename 'dirname';
 use File::Spec::Functions 'catdir';
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 # This method will run once at server start
 sub startup {

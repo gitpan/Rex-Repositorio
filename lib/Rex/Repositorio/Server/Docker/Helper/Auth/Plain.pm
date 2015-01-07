@@ -11,7 +11,7 @@ use File::Spec;
 use JSON::XS;
 require IO::All;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 has user_path => ( is => 'ro' );
 

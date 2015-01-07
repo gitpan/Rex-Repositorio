@@ -9,7 +9,7 @@ package Rex::Repositorio::Server::Docker::Mojolicious::Plugin::DockerSession;
 use strict;
 use warnings;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Data::Dumper;

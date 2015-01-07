@@ -13,7 +13,7 @@ use File::Path;
 use JSON::XS;
 require IO::All;
 
-our $VERSION = '0.4.0'; # VERSION
+our $VERSION = '0.4.1'; # VERSION
 
 sub get_repo_images {
   my ($self) = @_;
